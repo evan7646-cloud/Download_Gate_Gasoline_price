@@ -34,8 +34,12 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
     # 統一去除時區資訊以免 Plotly 顯示格式異常
     if gate_df['time'].dt.tz is not None:
         gate_df['time'] = gate_df['time'].dt.tz_localize(None)
-    if pepper_df['time'].dt.tz is not None:
-        pepper_df['time'] = pepper_df['time'].dt.tz_localize(None)
+        
+    # Pepperstone 預設抓下來是 UTC 時間，我們必須手動將它轉換為台北時間 (+8)
+    if pepper_df['time'].dt.tz is None:
+        pepper_df['time'] = pepper_df['time'].dt.tz_localize('UTC').dt.tz_convert('Asia/Taipei').dt.tz_localize(None)
+    else:
+        pepper_df['time'] = pepper_df['time'].dt.tz_convert('Asia/Taipei').dt.tz_localize(None)
 
     gate_df = gate_df.dropna(subset=['time']).sort_values('time')
     pepper_df = pepper_df.dropna(subset=['time']).sort_values('time')
