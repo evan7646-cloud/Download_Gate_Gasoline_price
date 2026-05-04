@@ -27,9 +27,15 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
     if 'timestamp' in pepper_df.columns:
         pepper_df = pepper_df.rename(columns={'timestamp': 'time', 'close': 'close_pepper'})
 
-    # 轉換時間格式為 UTC 並排序
-    gate_df['time'] = pd.to_datetime(gate_df['time'], errors='coerce', utc=True)
-    pepper_df['time'] = pd.to_datetime(pepper_df['time'], errors='coerce', utc=True)
+    # 轉換時間格式 (移除 UTC 轉換以保留原始本地時間)
+    gate_df['time'] = pd.to_datetime(gate_df['time'], errors='coerce')
+    pepper_df['time'] = pd.to_datetime(pepper_df['time'], errors='coerce')
+    
+    # 統一去除時區資訊以免 Plotly 顯示格式異常
+    if gate_df['time'].dt.tz is not None:
+        gate_df['time'] = gate_df['time'].dt.tz_localize(None)
+    if pepper_df['time'].dt.tz is not None:
+        pepper_df['time'] = pepper_df['time'].dt.tz_localize(None)
 
     gate_df = gate_df.dropna(subset=['time']).sort_values('time')
     pepper_df = pepper_df.dropna(subset=['time']).sort_values('time')
@@ -45,6 +51,9 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
         go.Scatter(x=pepper_df['time'], y=pepper_df['close_pepper'], name="Pepperstone Gasoline", line=dict(color='#d62728', width=1.5), opacity=0.8)
     )
 
+    # 根據 timeframe 決定時間顯示格式
+    x_format = "%Y-%m-%d" if selected_tf == '1d' else "%Y-%m-%d %H:%M"
+
     # 介面與游標互動設定
     fig.update_layout(
         title_text=f"Gasoline 走勢比較 ({selected_tf.upper()})",
@@ -52,6 +61,11 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
         template="plotly_white",
         legend=dict(x=0.01, y=0.99),
         yaxis_title="報價 (Price)",
+        xaxis=dict(
+            title="時間",
+            tickformat=x_format,
+            hoverformat=x_format
+        ),
         height=600 # 加高圖表尺寸讓觀察更舒適
     )
 
