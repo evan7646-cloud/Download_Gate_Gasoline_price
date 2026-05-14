@@ -75,7 +75,7 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
                 buttons=list([
                     dict(count=1, label="1天", step="day", stepmode="backward"),
                     dict(count=3, label="3天", step="day", stepmode="backward"),
-                    dict(count=1, label="1週", step="week", stepmode="backward"),
+                    dict(count=7, label="1週", step="day", stepmode="backward"),
                     dict(count=1, label="1個月", step="month", stepmode="backward"),
                     dict(step="all", label="全部")
                 ]),
@@ -124,7 +124,7 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
                 buttons=list([
                     dict(count=1, label="1天", step="day", stepmode="backward"),
                     dict(count=3, label="3天", step="day", stepmode="backward"),
-                    dict(count=1, label="1週", step="week", stepmode="backward"),
+                    dict(count=7, label="1週", step="day", stepmode="backward"),
                     dict(count=1, label="1個月", step="month", stepmode="backward"),
                     dict(step="all", label="全部")
                 ]),
