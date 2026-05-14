@@ -27,20 +27,9 @@ if os.path.exists(gate_file) and os.path.exists(pepper_file):
     if 'timestamp' in pepper_df.columns:
         pepper_df = pepper_df.rename(columns={'timestamp': 'time', 'close': 'close_pepper'})
 
-    # 轉換時間格式 (移除 UTC 轉換以保留原始本地時間)
+    # 資料現在已經在各自下載腳本中統一轉換為 Asia/Taipei 並存為字串，所以我們直接解析即可
     gate_df['time'] = pd.to_datetime(gate_df['time'], errors='coerce')
     pepper_df['time'] = pd.to_datetime(pepper_df['time'], errors='coerce')
-    
-    # 統一去除時區資訊以免 Plotly 顯示格式異常
-    if gate_df['time'].dt.tz is not None:
-        gate_df['time'] = gate_df['time'].dt.tz_localize(None)
-        
-    # Pepperstone 預設抓下來是券商伺服器時間 (EET, 包含日光節約時間)
-    # 我們將它轉換為台北時間 (+8)
-    if pepper_df['time'].dt.tz is None:
-        pepper_df['time'] = pepper_df['time'].dt.tz_localize('EET').dt.tz_convert('Asia/Taipei').dt.tz_localize(None)
-    else:
-        pepper_df['time'] = pepper_df['time'].dt.tz_convert('Asia/Taipei').dt.tz_localize(None)
 
     gate_df = gate_df.dropna(subset=['time']).sort_values('time')
     pepper_df = pepper_df.dropna(subset=['time']).sort_values('time')
